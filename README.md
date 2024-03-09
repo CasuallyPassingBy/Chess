@@ -36,7 +36,7 @@ This is a Python implementation of a chess game using the Pygame library. The ga
 
 ## Contributors
 
-- [Mauricio Moscoso](https://github.com/yourusername)
+- [Mauricio Moscoso](https://github.com/CasuallyPassingBy)
 
 ## Acknowledgments
 
