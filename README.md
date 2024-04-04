@@ -38,11 +38,11 @@ This is a Python implementation of a chess game using the Pygame library. The ga
 
 - [Mauricio Moscoso](https://github.com/CasuallyPassingBy)
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - Thanks to the creators of the Pygame library for providing a powerful framework for game development in Python.
 - Inspired by various online resources and tutorials on chess programming and game development.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
