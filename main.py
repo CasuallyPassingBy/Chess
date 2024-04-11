@@ -32,7 +32,7 @@ IMAGES = [[load_image_piece(f'./pieces_svgs/piece_{i}{j}.svg') for j in range(6)
 # [x] unsafe squares
 # [x] checks
 # [x] checkmates
-# [ ] castling
+# [x] castling
 # [x] en passant 
 
 class Piece:
@@ -97,7 +97,7 @@ class Board:
                     return True
         return False
     
-    def IsEmpyt(self, position:list[int]) -> bool:
+    def IsEmpty(self, position:list[int]) -> bool:
         for piece in self.board:
             if piece.position == position:
                 return False
@@ -195,25 +195,28 @@ class MoveManager:
     turn = 0
 
     @staticmethod
-    def LegalMoves(piece:'Piece', board:'Board') -> list[list[int]]:
+    def LegalMoves(piece:'Optional[Piece]', board:'Board') -> list[list[int]]:
         '''
         Given a piece and the board state, we can calulate their legal moves of the piece.
         '''
+        if piece is None:
+            return []
+
         if piece.color != MoveManager.turn:
             return []
         
+    
         legal_moves = piece.legal_moves(board)
+
         legal_moves = [pos for pos in legal_moves if ((0 <= pos[0] <= 7) and (0 <= pos[1]<= 7))]
         same_color_occupied_positions = [dummy_piece.position for dummy_piece in board.board if dummy_piece.color == piece.color]
         legal_moves = list(filter(lambda x: x not in same_color_occupied_positions, legal_moves))
         
-        if isinstance(piece, King):
-            if (piece.possible_castle):
-                legal_moves += 
+        if isinstance(piece, King) and piece.possible_castle:
+            legal_moves += piece.castling(board)
 
-            pass
-        
         filtered_moves = []
+        
         for move in legal_moves:
             original_position = piece.position[:]
             # Apply the move temporarily
@@ -268,6 +271,35 @@ class MoveManager:
                         board.board.remove(piece)
                         del piece
                     break
+
+        # move-rookinator (moves rook after castling)
+        if isinstance(selected_piece, King):
+            castling_file = -1
+            rook = selected_piece
+
+            # king-sided castling
+            if rank == 6:
+                castling_file = 7
+                for possible_rook in board.board:
+                    if possible_rook.position[0] == castling_file  and possible_rook.position[1] == selected_piece.position[1] and \
+                    isinstance(possible_rook, Rook) and possible_rook.color == selected_piece.color:
+                        rook = possible_rook
+                        break
+                # move the rook
+                rook.position[0] -= 2
+                rook.rect.x = rook.position[0] * SQUARE_SIZE
+
+            elif rank == 2:
+                castling_file = 0
+                for possible_rook in board.board:
+                    if possible_rook.position[0] == castling_file  and possible_rook.position[1] == selected_piece.position[1] and \
+                    isinstance(possible_rook, Rook) and possible_rook.color == selected_piece.color:
+                        rook = possible_rook
+                        break
+                # move the rook
+                rook.position[0] += 3
+                rook.rect.x = rook.position[0] * SQUARE_SIZE
+
     
         # Checks if the pawn double moved to see if it en passantable 
         if isinstance(selected_piece, Pawn) and abs(file - selected_piece.position[1]) == 2:
@@ -311,26 +343,27 @@ class King(Piece):
     def attacking_squares(self, board: 'Board') -> list[list[int]]:
         return self.legal_moves(board)
     
-    def castling(self, board:'Board') -> list[list[int]]:
-        rooks:list[Rook] = []
+    def castling(self, board: 'Board')-> list[list[int]]:
+        if not self.possible_castle:
+            return []
         
-        castlings = []
-        for piece in board.board:
-            if piece.color == self.color and isinstance(piece, Rook):
-                if (piece.castling):
-                    rooks.append(piece)
+        castling_moves = []
+        king_side = [[i, self.position[1]] for i in range(5, 7)]
+        queen_side = [[i, self.position[1]] for i in range(1, 4)]
 
-        file, rank = self.position
-
+        # checking king side
+        rooks:list[Rook] = [piece for piece in board.board if isinstance(piece, Rook) and piece.color == self.color]
         for rook in rooks:
-            if rook.position[0] == 0:
-                for i in range(1, rank):
-                    print([file, i])
-                pass
+            if not rook.castling:
+                continue
+            # checking king side
+            if rook.position[0] == 7 and all(map(board.IsEmpty, king_side)):
+                castling_moves += [[self.position[0] + 2, self.position[1]]]
 
-            elif rook.position[0] == 7:
-                pass
-        return castlings
+            elif rook.position[0] == 7 and all(map(board.IsEmpty, queen_side)):
+                castling_moves += [[self.position[0] - 2, self.position[1]]]
+
+        return castling_moves
 
 class Queen(Piece):
     directions = [
@@ -435,6 +468,7 @@ class Pawn(Piece):
     special_ranks = (1, 6)
     directions = (1, -1)
     en_passant_rank = (4, 3)
+
     def __init__(self, color:int, pos: list[int]) -> None:
         super().__init__(color, pos)
         self.en_passant_able = False
@@ -454,6 +488,7 @@ class Pawn(Piece):
             legal_moves.append(forward)
         else:
             legal_moves = []
+        
         attacking_squares = self.attacking_squares(board)
 
         opposing_pieces_positions = [piece.position for piece in board.board if piece.color != self.color]
@@ -464,6 +499,7 @@ class Pawn(Piece):
         if self.position[1] == Pawn.en_passant_rank[self.color]:
             attacking_squares += [self.check_for_en_passant(board)]
         legal_moves += attacking_squares
+        legal_moves = [move for move in legal_moves if move is not None]
         return legal_moves
     
     def attacking_squares(self, board: 'Board') -> list[list[int]]:
