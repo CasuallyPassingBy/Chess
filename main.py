@@ -321,6 +321,13 @@ class MoveManager:
         elif isinstance(selected_piece, Rook):
             selected_piece.castling = False
 
+            # Check for pawn promotion
+        if isinstance(selected_piece, Pawn):
+            if selected_piece.position[1] == 0 or selected_piece.position[1] == 7:
+                # Promote pawn to queen (you can adjust this if you want other piece types)
+                board.board.append(Queen(selected_piece.color, selected_piece.position))
+                board.board.remove(selected_piece)
+
         # Check for checkmate
         if board.IsCheckmate(opponent_color):
             # End the game with a victory for the player who delivered the checkmate
