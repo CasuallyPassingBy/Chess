@@ -1,13 +1,7 @@
 import pygame
 from pieces import Piece
 from board import Board, MoveManager
-from constants import (WHITE,
-                       BLACK,
-                       SELECTED_BLACK,
-                       SELECTED_WHITE,
-                       WIDTH,
-                       HEIGHT,
-                       SQUARE_SIZE)
+from constants import WIDTH,HEIGHT,SQUARE_SIZE
 from typing import Optional
 
 pygame.font.init()
