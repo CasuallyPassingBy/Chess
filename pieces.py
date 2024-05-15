@@ -1,3 +1,4 @@
+
 import pygame
 from typing import TYPE_CHECKING
 from constants import SQUARE_SIZE

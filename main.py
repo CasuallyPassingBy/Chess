@@ -3,6 +3,7 @@ from pieces import Piece
 from board import Board, MoveManager
 from constants import WIDTH,HEIGHT,SQUARE_SIZE
 from typing import Optional
+from evaluation import Evaluator
 
 pygame.font.init()
 
@@ -14,7 +15,9 @@ def load_image_piece(path:str) -> pygame.Surface:
     image = pygame.transform.scale(image, (SQUARE_SIZE, SQUARE_SIZE))
     return image
 
-STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w   KQkq - 0 1'
+testing_fen = 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8'
+testing_fen_2 = '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -'
 IMAGES = [[load_image_piece(f'./pieces_svgs/piece_{i}{j}.svg') for j in range(6)] for i in range(2)]
 
 # To Do:
@@ -63,6 +66,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 endgame = MoveManager.MovePiece(selected_piece, board, legal_moves)
+                print(Evaluator.material_value(board))
                 selected_piece = None
                 legal_moves = []
 
