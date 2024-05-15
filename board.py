@@ -188,9 +188,8 @@ class ChessParser:
         '''
         pieces = []
         position = [0, 0]
-        len(fen.split(' '))
-        # print(baord_position, turn, castling, en_passant, halfmove, fullmove)
-        for character in fen:
+        board_position, turn, castling, en_passant, halfmove, fullmove = fen.split()
+        for character in board_position:
             if character == '/':
                 position[0] = 0
                 position[1] += 1
@@ -207,10 +206,22 @@ class ChessParser:
             elif character in '12345678':
                 position[0] += int(character)
 
-            elif character in 'wb':
-                MoveManager.turn = 0 if (character == 'b') else 1
-            
+        MoveManager.turn = 0 if (turn == 'b') else 1
 
+        rooks = [piece for piece in pieces if isinstance(piece, Rook)]
+        for character in castling:
+            if character == 'K':
+                castling_rook_pos = [7, 7]
+            elif character == 'Q':
+                castling_rook_pos = [0, 7]
+            elif character == 'k':
+                castling_rook_pos = [7, 0]
+            elif character == 'q':
+                castling_rook_pos = [0, 0]
+            for rook in rooks:
+                if rook.position == castling_rook_pos:
+                    rook.castling = True
+                    break
 
         return pieces
     
@@ -336,11 +347,11 @@ class MoveManager:
         Given a selected king piece, the board state, and a position, this method handles
         castling if applicable.
         """
-        rank = position[1]
+        rank = position[0]
         if isinstance(selected_piece, King):
             castling_file = -1
             rook = selected_piece
-
+            print(rank)
             # king-sided castling
             if rank == 6:
                 castling_file = 7
