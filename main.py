@@ -17,7 +17,7 @@ def load_image_piece(path:str) -> pygame.Surface:
 
 STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 testing_fen_1 = 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8'
-testing_fen_2 = '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -'
+testing_fen_2 = '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - -'
 IMAGES = [[load_image_piece(f'./pieces_svgs/piece_{i}{j}.svg') for j in range(6)] for i in range(2)]
 
 # To Do:

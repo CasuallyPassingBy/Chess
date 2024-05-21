@@ -188,7 +188,7 @@ class ChessParser:
         '''
         pieces = []
         position = [0, 0]
-        board_position, turn, castling, en_passant, halfmove, fullmove = fen.split()
+        board_position, turn, castling, _= fen.split()
         for character in board_position:
             if character == '/':
                 position[0] = 0
