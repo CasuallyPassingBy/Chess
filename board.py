@@ -188,7 +188,8 @@ class ChessParser:
         '''
         pieces = []
         position = [0, 0]
-        board_position, turn, castling, _= fen.split()
+        splitted_fen = fen.split(' ')
+        board_position, turn, castling, en_passant, halfmove, fullmove = splitted_fen
         for character in board_position:
             if character == '/':
                 position[0] = 0
@@ -209,19 +210,23 @@ class ChessParser:
         MoveManager.turn = 0 if (turn == 'b') else 1
 
         rooks = [piece for piece in pieces if isinstance(piece, Rook)]
-        for character in castling:
-            if character == 'K':
-                castling_rook_pos = [7, 7]
-            elif character == 'Q':
-                castling_rook_pos = [0, 7]
-            elif character == 'k':
-                castling_rook_pos = [7, 0]
-            elif character == 'q':
-                castling_rook_pos = [0, 0]
+        if castling == '-': 
             for rook in rooks:
-                if rook.position == castling_rook_pos:
-                    rook.castling = True
-                    break
+                rook.castling = False
+        else:
+            for character in castling:
+                if character == 'K':
+                    castling_rook_pos = [7, 7]
+                elif character == 'Q':
+                    castling_rook_pos = [0, 7]
+                elif character == 'k':
+                    castling_rook_pos = [7, 0]
+                elif character == 'q':
+                    castling_rook_pos = [0, 0]
+                for rook in rooks:
+                    if rook.position == castling_rook_pos:
+                        rook.castling = True
+                        break
 
         return pieces
     
